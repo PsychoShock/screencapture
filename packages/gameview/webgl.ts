@@ -101,12 +101,13 @@ function createProgram(gl: WebGLRenderingContext) {
 	return { program, vloc, tloc };
 }
 
-export function createGameView(canvas: HTMLCanvasElement) {
+export function createGameView(canvas: HTMLCanvasElement, options: { preserveDrawingBuffer?: boolean } = {}) {
 	const gl = canvas.getContext('webgl', {
 		antialias: false,
 		depth: false,
 		stencil: false,
 		alpha: false,
+		preserveDrawingBuffer: options.preserveDrawingBuffer ?? false,
 		desynchronized: true,
 		failIfMajorPerformanceCaveat: false
 	}) as WebGLRenderingContext;
@@ -142,6 +143,11 @@ export function createGameView(canvas: HTMLCanvasElement) {
 		gl,
 		animationFrame: void 0,
 		disposed: false,
+		draw: () => {
+			if (gameView.disposed) return;
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+			gl.finish();
+		},
 		resize: (width: number, height: number) => {
 			if (gameView.disposed) return;
 			gl.viewport(0, 0, width, height);
@@ -167,8 +173,7 @@ export function createGameView(canvas: HTMLCanvasElement) {
 
 	render = () => {
 		if (gameView.disposed) return;
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-		gl.finish();
+		gameView.draw();
 
         // @ts-ignore
 		gameView.animationFrame = requestAnimationFrame(render);

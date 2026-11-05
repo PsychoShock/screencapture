@@ -76,11 +76,14 @@ export class Capture {
       canvas.width = width;
       canvas.height = height;
 
-      this.#gameView = createGameView(canvas);
+      this.#gameView = createGameView(canvas, { preserveDrawingBuffer: true });
       this.#gameView.resize(width, height);
 
       // Wait for the FiveM WebGL hook to populate the game framebuffer
-      await this.waitForFrames(3);
+      await this.waitForFrames(5);
+
+      // Snapshot in the same task as the final draw, before CEF can clear the framebuffer.
+      this.#gameView.draw();
 
       const enc = request.encoding ?? 'png';
       let imageData: string | Blob;

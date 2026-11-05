@@ -4,6 +4,43 @@ A FiveM resource for capturing screenshots and recording videos from a player's 
 
 ---
 
+## PStudio edition
+
+This fork of [itschip/screencapture](https://github.com/itschip/screencapture) is based on upstream v0.17.2 and includes the black-frame screenshot fix tested with the PStudio phone in FiveM.
+
+### Ready-to-start installation
+
+1. Download **screencapture.zip** from the [PStudio release](https://github.com/PsychoShock/screencapture/releases/tag/v0.17.2-pstudio.1), not GitHub's source-code ZIP.
+2. Extract the `screencapture` folder into your server resources. Keep that resource name.
+3. Use a recent FXServer artifact with Node.js 22 support. Stop `screenshot-basic` if installed.
+4. Start the resources in this order:
+
+```cfg
+ensure screencapture
+ensure pstudio_core
+```
+
+For an existing installation, replace the resource files and run `restart screencapture`. Previously saved black images cannot be recovered; take a new photo. This resource targets FiveM/GTA V, not RedM.
+
+### What changed
+
+Still-image capture preserves the WebGL drawing buffer, waits five render frames, and draws immediately before encoding. Video rendering keeps the upstream non-preserved buffer default. Existing exports and upload APIs are unchanged. The fix was confirmed in-game with the PStudio phone and CDN.
+
+### Build from source
+
+Use Node.js 22 and pnpm 9.11.0:
+
+```sh
+pnpm --filter @screencapture/nui... --filter @screencapture/game... install --frozen-lockfile --ignore-scripts
+pnpm --filter @screencapture/gameview build
+pnpm --filter @screencapture/game build
+pnpm --filter @screencapture/nui build
+```
+
+The `pstudio` branch contains this edition. Pushing a `v*-pstudio.*` tag builds and publishes a ready-to-start ZIP through GitHub Actions; it does not publish upstream npm packages. Original attribution and the repository's AGPL-3.0 LICENSE are preserved.
+
+---
+
 ## Screenshots
 
 ### `serverCapture` — server-side export
